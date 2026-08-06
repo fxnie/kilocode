@@ -20,6 +20,7 @@ test("fixScripts preserves Kilo-only root scripts from base", () => {
       extension: "bun --cwd packages/kilo-vscode script/launch.ts",
       "extension:isolated": "bun --cwd packages/kilo-vscode script/launch.ts --isolated",
       "extension:isolated:clean": "bun --cwd packages/kilo-vscode script/launch.ts --isolated --clean",
+      "test:script:ci": "bun test ./script",
     },
   }
   const pkg: Record<string, unknown> = {
@@ -33,6 +34,7 @@ test("fixScripts preserves Kilo-only root scripts from base", () => {
   expect(scripts.extension).toBe(ours.scripts.extension)
   expect(scripts["extension:isolated"]).toBe(ours.scripts["extension:isolated"])
   expect(scripts["extension:isolated:clean"]).toBe(ours.scripts["extension:isolated:clean"])
+  expect(scripts["test:script:ci"]).toBe(ours.scripts["test:script:ci"])
   expect(changes.some((c) => c.includes("postinstall"))).toBe(true)
   expect(changes.some((c) => c.includes("dev-setup"))).toBe(true)
 })
@@ -69,6 +71,7 @@ test("fixScripts removes upstream-only dead scripts from root", () => {
       "dev:desktop": "bun --cwd packages/desktop-electron dev",
       "dev:web": "bun --cwd packages/app dev",
       "dev:console": "ulimit -n 10240 2>/dev/null; bun run --cwd packages/console/app dev",
+      "translate:app": "bun run script/translate-app.ts",
     },
   }
   const changes: string[] = []
@@ -78,7 +81,8 @@ test("fixScripts removes upstream-only dead scripts from root", () => {
   expect(scripts["dev:desktop"]).toBeUndefined()
   expect(scripts["dev:web"]).toBeUndefined()
   expect(scripts["dev:console"]).toBeUndefined()
-  expect(changes.length).toBe(3)
+  expect(scripts["translate:app"]).toBeUndefined()
+  expect(changes.length).toBe(4)
 })
 
 test("fixScripts preserves opencode test scripts", () => {

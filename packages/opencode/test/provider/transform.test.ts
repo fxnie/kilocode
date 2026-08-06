@@ -4235,7 +4235,8 @@ describe("ProviderTransform.variants", () => {
     })
     // kilocode_change end
 
-    test("grok-4 uses the provider's standard efforts", () => {
+    // kilocode_change start - retain the model team's explicit Grok variant policy
+    test("grok-4 suppresses generic provider efforts", () => {
       const model = createMockModel({
         id: "openrouter/grok-4",
         providerID: "openrouter",
@@ -4246,9 +4247,9 @@ describe("ProviderTransform.variants", () => {
         },
       })
       const result = ProviderTransform.variants(model)
-      expect(Object.keys(result)).toEqual(["low", "medium", "high"])
-      expect(result.medium).toEqual({ reasoning: { effort: "medium" } })
+      expect(result).toEqual({})
     })
+    // kilocode_change end
 
     test("grok-3-mini returns low and high with reasoning", () => {
       const model = createMockModel({
