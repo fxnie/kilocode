@@ -1507,17 +1507,6 @@ export function options(input: {
     }
   }
 
-  // kilocode_change start
-  if (
-    input.providerOptions?.setCacheKey !== false &&
-    ((input.model.providerID === "openai" && input.model.api.npm !== "@ai-sdk/openai-compatible") ||
-      input.model.api.npm === "@ai-sdk/openai" ||
-      input.model.api.npm === "@ai-sdk/xai" ||
-      input.providerOptions?.setCacheKey)
-  ) {
-    result["promptCacheKey"] = input.sessionID
-  }
-  // kilocode_change end
   if (input.model.providerID === "meta" && input.model.api.npm === "@ai-sdk/openai") {
     result["reasoningSummary"] = "auto"
     result["include"] = INCLUDE_ENCRYPTED_REASONING
@@ -1574,6 +1563,8 @@ export function options(input: {
       input.model.api.npm === "@ai-sdk/xai" ||
       input.model.api.npm === "@ai-sdk/mistral" ||
       input.model.api.npm === "venice-ai-sdk-provider" ||
+      // kilocode_change - retain cache keys for OpenAI providers using nonstandard SDK packages
+      (input.model.providerID === "openai" && input.model.api.npm !== "@ai-sdk/openai-compatible") ||
       input.providerOptions?.setCacheKey === true
     ) {
       result["promptCacheKey"] = input.sessionID
@@ -1656,7 +1647,8 @@ export function smallOptions(model: Provider.Model) {
       return { reasoning: { enabled: false } }
     }
   }
-  if (model.api.npm === "@kilocode/kilo-gateway") { // kilocode_change
+  if (model.api.npm === "@kilocode/kilo-gateway") {
+    // kilocode_change
     if (!model.capabilities.reasoning) return {} // kilocode_change - omit unsupported reasoning options
     return { reasoning: { enabled: true } } // kilocode_change - use the model's supported default effort
   }

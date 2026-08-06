@@ -125,8 +125,14 @@ export const TaskTool = Tool.define(
       let current = parent
       let depth = 0
       while (current.parentID) {
+        // kilocode_change start - tolerate pruned or corrupt ancestor rows
+        const next = yield* sessions
+          .get(current.parentID)
+          .pipe(Effect.catchTag("NotFoundError", () => Effect.succeed(undefined)))
+        if (!next) break
+        // kilocode_change end
         depth++
-        current = yield* sessions.get(current.parentID)
+        current = next // kilocode_change
       }
       if (depth >= (cfg.subagent_depth ?? 1)) {
         return yield* Effect.fail(
